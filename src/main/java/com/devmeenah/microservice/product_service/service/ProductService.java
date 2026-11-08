@@ -1,7 +1,10 @@
 package com.devmeenah.microservice.product_service.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import com.devmeenah.microservice.product_service.dto.ProductRequest;
+import com.devmeenah.microservice.product_service.dto.ProductResponse;
 import com.devmeenah.microservice.product_service.model.Product;
 import com.devmeenah.microservice.product_service.repository.ProductRepository;
 
@@ -13,11 +16,11 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public Boolean createProduct(ProductRequest productRequest) {
+    public ProductResponse createProduct(ProductRequest productRequest) {
         Boolean isProductCreated = false;
-
+        Product aProduct = null;
         try{
-            Product aProduct = Product.builder()
+            aProduct = Product.builder()
                 .name(productRequest.name())
                 .description(productRequest.description())
                 .price(productRequest.price())
@@ -26,14 +29,21 @@ public class ProductService {
 
             productRepository.save(aProduct);
             isProductCreated = true;
-
-            return isProductCreated;
         }
         catch(Exception e){ 
             isProductCreated = false;
         }
 
-        return isProductCreated; // Placeholder return value
+        return isProductCreated && aProduct != null ? new ProductResponse(aProduct.getId(), aProduct.getDescription(), aProduct.getPrice()): null; // Placeholder return value
+    }
+
+    public List<Product> getAllProducts() {
+        try{
+            return productRepository.findAll();
+        }
+        catch(Exception e){ }
+
+        return null;
     }
 
 }
