@@ -34,7 +34,13 @@ public class ProductService {
             isProductCreated = false;
         }
 
-        return isProductCreated && aProduct != null ? new ProductResponse(aProduct.getId(), aProduct.getDescription(), aProduct.getPrice()): null; // Placeholder return value
+        return isProductCreated && aProduct != null
+            ? new ProductResponse(
+                aProduct.getId(),
+                aProduct.getName(),
+                aProduct.getDescription(),
+                aProduct.getPrice())
+            : null;
     }
 
     public List<Product> getAllProducts() {

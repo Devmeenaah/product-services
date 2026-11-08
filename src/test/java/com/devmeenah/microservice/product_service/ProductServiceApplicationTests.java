@@ -1,5 +1,6 @@
 package com.devmeenah.microservice.product_service;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,20 +11,42 @@ import org.testcontainers.mongodb.MongoDBContainer;
 import io.restassured.RestAssured;
  
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductServiceApplicationTests {
 	static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0.5");
 	@LocalServerPort 
 	private Integer port;
+
 	@BeforeEach 
 	void setup() {
-		RestAssured.baseURI = "http://localhost:";
+		RestAssured.baseURI = "http://localhost";
 		RestAssured.port = port;
-		//mongoDBContainer.start();
+		mongoDBContainer.start();
 	}
 
+
 	@Test
-	void contextLoads() {
+	void shouldCreateProduct() {
+		//create a request body as a string. it will be a json string of
+		String requestBody = """
+					{ 
+						"name": "Iphone 15", 	
+						"description":"Iphone 15 is a smartphone from Apple", 
+						"price": 1000
+					}
+				""";
+		//use restAssured to create the http request 
+		RestAssured.given()
+					.contentType("application/json")
+					.body(requestBody)
+					.when()
+					.post("api/product")
+					.then()
+					.statusCode(201)
+					.body("id", Matchers.notNullValue())
+					.body("name", Matchers.notNullValue())
+					.body("description", Matchers.notNullValue());
+
 	}
 
 }
